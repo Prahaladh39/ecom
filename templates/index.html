@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}SchoolMart | Buy & Sell Student Supplies & Projects{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-pill">
+            <i class="bi bi-stars"></i> Peer-to-Peer Student Marketplace
+        </div>
+        <h1 class="hero-title">
+            Buy & Sell <span>School Supplies</span> Directly
+        </h1>
+        <p class="hero-subtitle">
+            Trade NCERT books, handwritten topper notes, science fair electronics, and lab equipment with fellow students at fair prices.
+        </p>
+
+        <!-- Search Bar -->
+        <form action="{{ url_for('index') }}" method="GET" class="search-filter-box">
+            <input type="hidden" name="category" value="{{ current_category }}">
+            <div class="search-input-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text" name="search" class="search-input" 
+                       placeholder="Search textbooks, notes, Arduino kits, calculators..." 
+                       value="{{ current_search }}" id="search-input">
+            </div>
+            <button type="submit" class="search-btn" id="search-submit-btn">
+                Search
+            </button>
+        </form>
+    </div>
+</section>
+
+<!-- Category Pills Bar -->
+<div class="container">
+    <div class="category-bar">
+        {% for cat in categories %}
+            <a href="{{ url_for('index', category=cat.id, search=current_search, sort=current_sort) }}" 
+               class="cat-chip {{ 'active' if current_category == cat.id else '' }}">
+                <i class="bi {{ cat.icon }}"></i>
+                <span>{{ cat.name }}</span>
+            </a>
+        {% endfor %}
+    </div>
+
+    <!-- Section Header (Count & Sort) -->
+    <div class="section-header">
+        <div>
+            <h2 class="section-title">
+                {% if current_search %}
+                    Search Results for "{{ current_search }}"
+                {% elif current_category != 'all' %}
+                    {{ current_category }}
+                {% else %}
+                    Featured Listings
+                {% endif %}
+            </h2>
+            <span style="font-size:0.86rem; color:var(--text-muted);">
+                Showing {{ products|length }} {{ 'product' if products|length == 1 else 'products' }}
+            </span>
+        </div>
+
+        <!-- Sort Select -->
+        <form action="{{ url_for('index') }}" method="GET" style="display:flex; align-items:center; gap:0.5rem;">
+            <input type="hidden" name="category" value="{{ current_category }}">
+            <input type="hidden" name="search" value="{{ current_search }}">
+            <label for="sort-select" style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">Sort By:</label>
+            <select name="sort" id="sort-select" onchange="this.form.submit()" 
+                    style="padding:0.4rem 0.8rem; border-radius:var(--radius-md); border:1px solid var(--border-color); font-family:inherit; font-size:0.86rem; background:white; color:var(--text-main); cursor:pointer;">
+                <option value="newest" {{ 'selected' if current_sort == 'newest' else '' }}>Newest First</option>
+                <option value="price_low" {{ 'selected' if current_sort == 'price_low' else '' }}>Price: Low to High</option>
+                <option value="price_high" {{ 'selected' if current_sort == 'price_high' else '' }}>Price: High to Low</option>
+            </select>
+        </form>
+    </div>
+
+    <!-- Product Cards Grid -->
+    {% if products %}
+        <div class="products-grid">
+            {% for p in products %}
+                <article class="product-card" id="product-card-{{ p.id }}">
+                    <!-- Card Image -->
+                    <div class="product-img-wrapper">
+                        <a href="{{ url_for('product_detail', product_id=p.id) }}">
+                            <img src="{{ url_for('static', filename='uploads/' + (p.image_1 or 'sample_books_1.jpg')) }}" 
+                                 alt="{{ p.title }}" class="product-img" loading="lazy">
+                        </a>
+                        <span class="badge-category">{{ p.category }}</span>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <div class="product-seller-meta">
+                            <span class="seller-dot"></span>
+                            <span>{{ p.seller_name or 'Student Seller' }} ({{ p.seller_class or 'Class 12' }})</span>
+                        </div>
+
+                        <a href="{{ url_for('product_detail', product_id=p.id) }}">
+                            <h3 class="product-title" title="{{ p.title }}">{{ p.title }}</h3>
+                        </a>
+
+                        <p class="product-desc-snippet">
+                            {{ p.description }}
+                        </p>
+
+                        <div class="product-price-row">
+                            <div>
+                                <span class="product-price-currency">₹</span>
+                                <span class="product-price">{{ "{:,.0f}".format(p.price) }}</span>
+                            </div>
+                            <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">
+                                <i class="bi bi-clock-history"></i> Available
+                            </span>
+                        </div>
+
+                        <!-- Two Action Buttons: Buy Now & Add to Cart (As Requested in Audio) -->
+                        <div class="card-actions">
+                            <!-- Buy Now: Opens Seller WhatsApp Directly -->
+                            <a href="{{ p.whatsapp_url }}" target="_blank" rel="noopener noreferrer" 
+                               class="btn-buy-now" id="buy-now-btn-{{ p.id }}" 
+                               title="Contact student seller directly on WhatsApp">
+                                <i class="bi bi-whatsapp"></i> Buy Now
+                            </a>
+
+                            <!-- Add to Cart: Dynamic AJAX Cart Addition -->
+                            <form action="{{ url_for('add_to_cart_route', product_id=p.id) }}" method="POST" 
+                                  class="ajax-add-cart-form" style="display:contents;">
+                                <button type="submit" class="btn-add-cart" id="add-cart-btn-{{ p.id }}">
+                                    <i class="bi bi-bag-plus"></i> Add to Cart
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div style="text-align:center; padding:5rem 1.5rem; background:white; border-radius:var(--radius-lg); border:1px solid var(--border-color); margin-bottom:4rem;">
+            <div style="font-size:3.5rem; color:var(--text-light); margin-bottom:1rem;">
+                <i class="bi bi-search"></i>
+            </div>
+            <h3 style="font-size:1.5rem; margin-bottom:0.5rem;">No products found</h3>
+            <p style="color:var(--text-muted); max-width:460px; margin:0 auto 1.5rem;">
+                We couldn't find any products matching your query. Try searching for something else or be the first to sell it!
+            </p>
+            <a href="{{ url_for('sell') }}" class="btn-sell-product">
+                <i class="bi bi-plus-circle"></i> Sell This Product
+            </a>
+            <a href="{{ url_for('index') }}" class="btn-auth btn-signin" style="margin-left:0.75rem;">
+                Clear Filters
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

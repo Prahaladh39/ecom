@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.title }} | SchoolMart{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div style="margin-top: 1.5rem;">
+        <a href="{{ url_for('index') }}" style="display:inline-flex; align-items:center; gap:6px; font-size:0.88rem; color:var(--text-muted); font-weight:600;">
+            <i class="bi bi-arrow-left"></i> Back to all listings
+        </a>
+    </div>
+
+    <div class="product-detail-wrapper">
+        <!-- Left: Image Gallery -->
+        <div class="product-gallery">
+            <div class="gallery-main">
+                <img id="main-gallery-image" 
+                     src="{{ url_for('static', filename='uploads/' + (product.images[0] if product.images else 'sample_books_1.jpg')) }}" 
+                     alt="{{ product.title }}">
+            </div>
+
+            <!-- Thumbnails if more than 1 image exists -->
+            {% if product.images and product.images|length > 1 %}
+                <div class="gallery-thumbs">
+                    {% for img in product.images %}
+                        <div class="gallery-thumb {{ 'active' if loop.first else '' }}" 
+                             data-full-img="{{ url_for('static', filename='uploads/' + img) }}">
+                            <img src="{{ url_for('static', filename='uploads/' + img) }}" alt="Thumbnail {{ loop.index }}">
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Right: Information & Actions -->
+        <div class="detail-info">
+            <div class="detail-badge-row">
+                <span class="badge-category" style="position:static;">{{ product.category }}</span>
+                <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">
+                    <i class="bi bi-shield-fill-check" style="color:var(--success);"></i> Verified Student Seller
+                </span>
+            </div>
+
+            {% if current_user and current_user.id == product.user_id %}
+                <div style="margin-bottom: 0.85rem; padding: 0.6rem 0.9rem; background: var(--primary-light); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; border: 1px solid rgba(79, 70, 229, 0.2);">
+                    <span style="font-size: 0.82rem; color: var(--primary); font-weight: 700;">
+                        <i class="bi bi-person-check-fill"></i> You are the owner of this listing
+                    </span>
+                    <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn-auth btn-signin" style="background: white; font-size: 0.78rem; padding: 0.35rem 0.75rem; color: var(--primary); border-color: var(--primary); font-weight: 700;">
+                        <i class="bi bi-pencil-square"></i> Edit Listing
+                    </a>
+                </div>
+            {% endif %}
+
+            <h1 class="detail-title">{{ product.title }}</h1>
+
+            <div class="detail-price-box">
+                <span class="product-price-currency" style="font-size:1.6rem;">₹</span>
+                <span class="detail-price">{{ "{:,.0f}".format(product.price) }}</span>
+                <span style="color:var(--text-muted); font-size:0.85rem; margin-left:auto;">Fixed Student Price</span>
+            </div>
+
+            <!-- Seller Information Card -->
+            <div class="seller-info-card">
+                <div class="seller-info-header">
+                    <div class="user-avatar-circle" style="width:36px; height:36px; font-size:1rem;">
+                        {{ (product.seller_name or 'S')[0].upper() }}
+                    </div>
+                    <div>
+                        <div style="font-weight:700; font-size:0.95rem;">{{ product.seller_name or 'Student Seller' }}</div>
+                        <div style="font-size:0.8rem; color:var(--text-muted);">{{ product.seller_class or 'Class 12' }}</div>
+                    </div>
+                </div>
+                <div style="font-size:0.85rem; color:var(--text-muted); display:flex; align-items:center; gap:6px; margin-top:0.4rem;">
+                    <i class="bi bi-telephone-fill" style="color:var(--whatsapp);"></i>
+                    <span>Contact / WhatsApp: <strong>{{ product.phone }}</strong></span>
+                </div>
+            </div>
+
+            <!-- Product Description -->
+            <div style="margin-bottom: 2rem;">
+                <h3 style="font-size:1.05rem; margin-bottom:0.6rem; color:var(--text-main);">About This Item</h3>
+                <p style="color:var(--text-muted); font-size:0.95rem; white-space:pre-line; line-height:1.7;">
+                    {{ product.description }}
+                </p>
+            </div>
+
+            <!-- Primary CTAs: Buy Now & Add to Cart -->
+            <div style="display:flex; flex-direction:column; gap:0.85rem; margin-top:auto;">
+                <!-- WhatsApp Buy Now Button (Per Audio) -->
+                <a href="{{ product.whatsapp_url }}" target="_blank" rel="noopener noreferrer" 
+                   class="btn-buy-now" style="padding:0.9rem; font-size:1.05rem;" id="detail-buy-now-btn">
+                    <i class="bi bi-whatsapp" style="font-size:1.25rem;"></i> Buy Now via WhatsApp
+                </a>
+
+                <!-- Add to Cart Button -->
+                <form action="{{ url_for('add_to_cart_route', product_id=product.id) }}" method="POST" 
+                      class="ajax-add-cart-form">
+                    <button type="submit" class="btn-add-cart" style="width:100%; padding:0.85rem; font-size:1rem;" id="detail-add-cart-btn">
+                        <i class="bi bi-bag-plus"></i> Add to Cart
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

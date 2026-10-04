@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Sell Your Product | SchoolMart{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="sell-wrapper">
+        <div class="sell-header">
+            <span class="hero-pill">
+                <i class="bi bi-tag-fill"></i> List an Item for Sale
+            </span>
+            <h1>Sell Your Product</h1>
+            <p>Upload photos, set your price, and connect with student buyers directly on WhatsApp.</p>
+        </div>
+
+        <form action="{{ url_for('sell') }}" method="POST" enctype="multipart/form-data" id="sell-product-form">
+            <!-- Product Title -->
+            <div class="form-group">
+                <label for="title" class="form-label">
+                    Product Title <span class="req">*</span>
+                </label>
+                <input type="text" id="title" name="title" class="form-input" 
+                       placeholder="e.g. CBSE Class 12 Chemistry NCERT Part 1 & 2" required maxlength="140">
+            </div>
+
+            <div class="form-row">
+                <!-- Category -->
+                <div class="form-group">
+                    <label for="category" class="form-label">
+                        Category <span class="req">*</span>
+                    </label>
+                    <select id="category" name="category" class="form-select" required>
+                        <option value="" disabled selected>Select Category</option>
+                        <option value="Textbooks">Textbooks</option>
+                        <option value="Study Notes">Study Notes</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Project Kits">Project Kits</option>
+                        <option value="Uniforms">Uniforms</option>
+                        <option value="Stationery">Stationery</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Price -->
+                <div class="form-group">
+                    <label for="price" class="form-label">
+                        Price (₹) <span class="req">*</span>
+                    </label>
+                    <input type="number" id="price" name="price" class="form-input" 
+                           placeholder="e.g. 450" step="1" min="0" required>
+                </div>
+            </div>
+
+            <!-- WhatsApp Phone Number -->
+            <div class="form-group">
+                <label for="phone" class="form-label">
+                    Seller WhatsApp Phone Number <span class="req">*</span>
+                </label>
+                <input type="tel" id="phone" name="phone" class="form-input" 
+                       placeholder="e.g. 9876543210 (10-digit mobile number)" 
+                       value="{{ user.phone if user else '' }}" required>
+                <small style="color:var(--text-muted); font-size:0.8rem; display:block; margin-top:0.35rem;">
+                    <i class="bi bi-shield-check"></i> Buyers will contact you on this WhatsApp number when clicking "Buy Now".
+                </small>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+                <label for="description" class="form-label">
+                    Detailed Description <span class="req">*</span>
+                </label>
+                <textarea id="description" name="description" rows="4" class="form-textarea" 
+                          placeholder="Describe condition, edition year, included accessories, or any markings..." required></textarea>
+            </div>
+
+            <!-- Upload up to 3 Images (Per Audio Requirement) -->
+            <div class="form-group">
+                <label class="form-label">
+                    Upload Photos (Up to 3 Images) <span class="req">*</span>
+                </label>
+                
+                <div class="image-upload-zone" id="upload-dropzone">
+                    <input type="file" id="product-images-input" name="images" 
+                           accept="image/png, image/jpeg, image/jpg, image/webp" multiple>
+                    <div class="upload-icon">
+                        <i class="bi bi-cloud-arrow-up-fill"></i>
+                    </div>
+                    <div style="font-weight:600; font-size:0.95rem; margin-bottom:0.25rem;">
+                        Click or drag images here to upload
+                    </div>
+                    <p style="font-size:0.82rem; color:var(--text-muted); margin:0;">
+                        PNG, JPG, or WEBP &bull; Select up to 3 photos
+                    </p>
+                </div>
+
+                <!-- 3 Live Preview Slots -->
+                <div class="image-preview-grid" id="image-preview-grid">
+                    <div class="preview-slot" id="slot-1">
+                        <span class="preview-slot-empty">Image 1 (Main Cover)</span>
+                    </div>
+                    <div class="preview-slot" id="slot-2">
+                        <span class="preview-slot-empty">Image 2 (Optional)</span>
+                    </div>
+                    <div class="preview-slot" id="slot-3">
+                        <span class="preview-slot-empty">Image 3 (Optional)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div style="margin-top: 2rem;">
+                <button type="submit" class="btn-sell-product" style="width:100%; justify-content:center; padding:0.9rem; font-size:1.05rem;" id="submit-sell-btn">
+                    <i class="bi bi-check2-circle"></i> Publish Listing Now
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

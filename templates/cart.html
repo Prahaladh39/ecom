@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart | SchoolMart{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="cart-wrapper">
+        <div style="margin-bottom: 2rem;">
+            <h1 style="font-size: 2rem; margin-bottom: 0.35rem;">Your Shopping Cart</h1>
+            <p style="color:var(--text-muted); font-size:0.92rem;">Review your items and proceed to connect with the sellers.</p>
+        </div>
+
+        {% if items %}
+            <div class="cart-table-card">
+                {% for item in items %}
+                    <div class="cart-item-row" id="cart-item-{{ item.product_id }}">
+                        <img src="{{ url_for('static', filename='uploads/' + (item.image_1 or 'sample_books_1.jpg')) }}" 
+                             alt="{{ item.title }}" class="cart-item-thumb">
+
+                        <div class="cart-item-info">
+                            <span class="badge-category" style="position:static; display:inline-block; margin-bottom:0.3rem; font-size:0.7rem;">
+                                {{ item.category }}
+                            </span>
+                            <a href="{{ url_for('product_detail', product_id=item.product_id) }}" style="display:block; font-weight:700; font-size:1.05rem; color:var(--text-main); margin-bottom:0.25rem;">
+                                {{ item.title }}
+                            </a>
+                            <div style="font-size:0.82rem; color:var(--text-muted);">
+                                Seller: <strong>{{ item.seller_name }}</strong> &bull; Qty: {{ item.quantity }}
+                            </div>
+                        </div>
+
+                        <div style="text-align:right;">
+                            <div style="font-family:'Outfit',sans-serif; font-weight:800; font-size:1.25rem; color:var(--text-main); margin-bottom:0.5rem;">
+                                ₹{{ "{:,.0f}".format(item.item_total) }}
+                            </div>
+                            <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+                                <a href="{{ item.whatsapp_url }}" target="_blank" rel="noopener noreferrer" 
+                                   class="btn-buy-now" style="padding:0.45rem 0.8rem; font-size:0.82rem;" title="Chat with seller on WhatsApp">
+                                    <i class="bi bi-whatsapp"></i> Buy Now
+                                </a>
+                                <a href="{{ url_for('remove_from_cart_route', product_id=item.product_id) }}" 
+                                   class="btn-auth btn-signin" style="padding:0.45rem 0.7rem; font-size:0.82rem; color:var(--danger);" title="Remove item">
+                                    <i class="bi bi-trash3"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Cart Summary & Actions -->
+            <div class="cart-summary-card" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+                <div>
+                    <span style="font-size:0.9rem; color:var(--text-muted);">Grand Total ({{ items|length }} {{ 'item' if items|length == 1 else 'items' }}):</span>
+                    <div style="font-family:'Outfit',sans-serif; font-size:2rem; font-weight:800; color:var(--text-main);">
+                        ₹{{ "{:,.0f}".format(grand_total) }}
+                    </div>
+                </div>
+
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                    <a href="{{ url_for('clear_cart_route') }}" class="btn-auth btn-signin" style="color:var(--text-muted);" 
+                       onclick="return confirm('Are you sure you want to clear your cart?');">
+                        <i class="bi bi-trash"></i> Clear Cart
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn-sell-product" style="padding:0.75rem 1.4rem;">
+                        <i class="bi bi-bag-plus"></i> Continue Shopping
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <!-- Empty Cart State -->
+            <div style="text-align:center; padding:5rem 1.5rem; background:white; border-radius:var(--radius-lg); border:1px solid var(--border-color);">
+                <div style="font-size:3.5rem; color:var(--text-light); margin-bottom:1rem;">
+                    <i class="bi bi-bag-x"></i>
+                </div>
+                <h3 style="font-size:1.5rem; margin-bottom:0.5rem;">Your Cart is Empty</h3>
+                <p style="color:var(--text-muted); max-width:440px; margin:0 auto 1.5rem;">
+                    Explore listings from students in your school. Find books, electronics, project kits, and notes!
+                </p>
+                <a href="{{ url_for('index') }}" class="btn-sell-product" style="display:inline-flex;">
+                    <i class="bi bi-shop"></i> Explore Marketplace
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
