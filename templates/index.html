@@ -18,11 +18,10 @@
 
         <!-- Search Bar -->
         <form action="{{ url_for('index') }}" method="GET" class="search-filter-box">
-            <input type="hidden" name="category" value="{{ current_category }}">
             <div class="search-input-wrapper">
                 <i class="bi bi-search"></i>
                 <input type="text" name="search" class="search-input" 
-                       placeholder="Search textbooks, notes, Arduino kits, calculators..." 
+                       placeholder="" 
                        value="{{ current_search }}" id="search-input">
             </div>
             <button type="submit" class="search-btn" id="search-submit-btn">
@@ -32,26 +31,13 @@
     </div>
 </section>
 
-<!-- Category Pills Bar -->
 <div class="container">
-    <div class="category-bar">
-        {% for cat in categories %}
-            <a href="{{ url_for('index', category=cat.id, search=current_search, sort=current_sort) }}" 
-               class="cat-chip {{ 'active' if current_category == cat.id else '' }}">
-                <i class="bi {{ cat.icon }}"></i>
-                <span>{{ cat.name }}</span>
-            </a>
-        {% endfor %}
-    </div>
-
-    <!-- Section Header (Count & Sort) -->
+    <!-- Section Header -->
     <div class="section-header">
         <div>
             <h2 class="section-title">
                 {% if current_search %}
                     Search Results for "{{ current_search }}"
-                {% elif current_category != 'all' %}
-                    {{ current_category }}
                 {% else %}
                     Featured Listings
                 {% endif %}
@@ -60,19 +46,6 @@
                 Showing {{ products|length }} {{ 'product' if products|length == 1 else 'products' }}
             </span>
         </div>
-
-        <!-- Sort Select -->
-        <form action="{{ url_for('index') }}" method="GET" style="display:flex; align-items:center; gap:0.5rem;">
-            <input type="hidden" name="category" value="{{ current_category }}">
-            <input type="hidden" name="search" value="{{ current_search }}">
-            <label for="sort-select" style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">Sort By:</label>
-            <select name="sort" id="sort-select" onchange="this.form.submit()" 
-                    style="padding:0.4rem 0.8rem; border-radius:var(--radius-md); border:1px solid var(--border-color); font-family:inherit; font-size:0.86rem; background:white; color:var(--text-main); cursor:pointer;">
-                <option value="newest" {{ 'selected' if current_sort == 'newest' else '' }}>Newest First</option>
-                <option value="price_low" {{ 'selected' if current_sort == 'price_low' else '' }}>Price: Low to High</option>
-                <option value="price_high" {{ 'selected' if current_sort == 'price_high' else '' }}>Price: High to Low</option>
-            </select>
-        </form>
     </div>
 
     <!-- Product Cards Grid -->
@@ -109,9 +82,6 @@
                                 <span class="product-price-currency">₹</span>
                                 <span class="product-price">{{ "{:,.0f}".format(p.price) }}</span>
                             </div>
-                            <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">
-                                <i class="bi bi-clock-history"></i> Available
-                            </span>
                         </div>
 
                         <!-- Two Action Buttons: Buy Now & Add to Cart (As Requested in Audio) -->
